@@ -1,0 +1,24 @@
+{
+  "name": "qr-code-generator",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "volta": {
+    "node": "24.19.0"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace=server & npm run dev --workspace=web",
+    "dev:server": "npm run dev --workspace=server",
+    "dev:web": "npm run dev --workspace=web",
+    "build": "npm run build --workspace=web && npm run build --workspace=server",
+    "start": "npm run start --workspace=server",
+    "test": "npm run test --workspace=web",
+    "typecheck": "npm run typecheck --workspace=server && npm run typecheck --workspace=web"
+  }
+}
