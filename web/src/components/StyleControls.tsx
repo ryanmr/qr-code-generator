@@ -24,7 +24,9 @@ import { MAX_LOGO_SCALE, renderSvg, type Logo } from '@/lib/qr/render-svg';
 import { eyePath, modulePath } from '@/lib/qr/shapes';
 import {
   BUILTIN_PRESETS,
+  COLOR_THEMES,
   DEFAULT_STYLE,
+  matchesTheme,
   EYE_SHAPES,
   MODULE_SHAPES,
   pickLook,
@@ -32,6 +34,7 @@ import {
   type EyeShape,
   type Look,
   type ModuleShape,
+  type ColorTheme,
   type Preset,
   type Style,
 } from '@/lib/style';
@@ -48,6 +51,7 @@ const MODULE_LABELS: Record<ModuleShape, string> = {
   vertical: 'Vertical',
   horizontal: 'Horizontal',
   diamond: 'Diamond',
+  star: 'Star',
 };
 
 const EYE_LABELS: Record<EyeShape, string> = {
@@ -143,6 +147,39 @@ function PresetThumb({ look, id }: { look: Look; id: string }) {
     [look, id],
   );
   return <div className="size-12 [&_svg]:size-full" dangerouslySetInnerHTML={{ __html: svg }} />;
+}
+
+function themeBackground({ colors: c }: ColorTheme): string {
+  if (c.gradient === 'linear') return `linear-gradient(${c.gradientAngle + 90}deg, ${c.fg}, ${c.fg2})`;
+  if (c.gradient === 'radial') return `radial-gradient(circle, ${c.fg}, ${c.fg2})`;
+  return c.fg;
+}
+
+function ThemeChip({ theme, selected, onClick }: { theme: ColorTheme; selected: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={selected}
+      title={theme.name}
+      onClick={onClick}
+      className={cn(
+        'flex flex-col items-center gap-1 rounded-md p-1 text-[11px] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        selected && 'text-foreground',
+      )}
+    >
+      <span
+        className={cn(
+          'flex size-9 items-center justify-center rounded-full border shadow-sm ring-offset-2 ring-offset-card',
+          selected && 'ring-2 ring-primary',
+        )}
+        style={{ background: theme.colors.bg }}
+      >
+        <span className="size-6 rounded-full" style={{ background: themeBackground(theme) }} />
+      </span>
+      <span className="w-full truncate text-center">{theme.name}</span>
+    </button>
+  );
 }
 
 // ---------------------------------------------------------------- fields
@@ -265,7 +302,7 @@ export function StyleControls({
           [...BUILTIN_PRESETS, ...customPresets].find((p) => sameLook(p.look, look))?.name ?? 'Custom'
         }
       >
-        <div role="radiogroup" aria-label="Presets" className="grid grid-cols-4 gap-2 sm:grid-cols-5">
+        <div role="radiogroup" aria-label="Presets" className="grid grid-cols-4 gap-2 sm:grid-cols-6">
           {BUILTIN_PRESETS.map((p, i) => (
             <Tile key={p.name} label={p.name} selected={sameLook(p.look, look)} onClick={() => onStyle(p.look)}>
               <PresetThumb look={p.look} id={`${idBase}-b${i}`} />
@@ -309,7 +346,7 @@ export function StyleControls({
         summary={`${MODULE_LABELS[style.moduleShape]} · ${EYE_LABELS[style.eyeFrame]} eyes`}
       >
         <Row label="Modules">
-          <div role="radiogroup" aria-label="Module shape" className="grid grid-cols-4 gap-2">
+          <div role="radiogroup" aria-label="Module shape" className="grid grid-cols-3 gap-2 sm:grid-cols-5">
             {MODULE_SHAPES.map((s) => (
               <Tile
                 key={s}
@@ -369,6 +406,18 @@ export function StyleControls({
           </span>
         }
       >
+        <Row label="Themes">
+          <div role="radiogroup" aria-label="Colour themes" className="grid grid-cols-5 gap-1">
+            {COLOR_THEMES.map((t) => (
+              <ThemeChip
+                key={t.name}
+                theme={t}
+                selected={!style.transparent && matchesTheme(style, t)}
+                onClick={() => onStyle({ ...t.colors, transparent: false })}
+              />
+            ))}
+          </div>
+        </Row>
         <div className="grid grid-cols-2 gap-3">
           <ColorField label="Foreground" value={style.fg} onChange={(fg) => onStyle({ fg })} />
           <ColorField

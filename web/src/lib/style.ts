@@ -9,6 +9,7 @@ export const MODULE_SHAPES = [
   'vertical',
   'horizontal',
   'diamond',
+  'star',
 ] as const;
 export type ModuleShape = (typeof MODULE_SHAPES)[number];
 
@@ -151,7 +152,100 @@ export const BUILTIN_PRESETS: Preset[] = [
     name: 'Bars',
     look: { ...base, moduleShape: 'vertical', eyeFrame: 'rounded', eyeBall: 'square', fg: '#064e3b' },
   },
+  {
+    name: 'Starry',
+    look: {
+      ...base,
+      moduleShape: 'star',
+      eyeFrame: 'circle',
+      eyeBall: 'circle',
+      fg: '#1e1b4b',
+      fg2: '#6d28d9',
+      gradient: 'radial',
+      bg: '#fefce8',
+      cornerRadius: 12,
+    },
+  },
+  {
+    name: 'Ocean',
+    look: {
+      ...base,
+      moduleShape: 'extra-rounded',
+      eyeFrame: 'rounded',
+      eyeBall: 'rounded',
+      fg: '#0e7490',
+      fg2: '#1e3a8a',
+      gradient: 'linear',
+      gradientAngle: 90,
+      bg: '#f0f9ff',
+      cornerRadius: 16,
+    },
+  },
+  {
+    name: 'Candy',
+    look: {
+      ...base,
+      moduleShape: 'dots',
+      eyeFrame: 'rounded',
+      eyeBall: 'circle',
+      fg: '#be185d',
+      fg2: '#c2410c',
+      gradient: 'linear',
+      gradientAngle: 135,
+      eyeColor: '#831843',
+      bg: '#fff1f2',
+      cornerRadius: 20,
+    },
+  },
+  {
+    name: 'Forest',
+    look: {
+      ...base,
+      moduleShape: 'classy',
+      eyeFrame: 'leaf',
+      eyeBall: 'leaf',
+      fg: '#14532d',
+      fg2: '#3f6212',
+      gradient: 'radial',
+      bg: '#f7fee7',
+      cornerRadius: 8,
+    },
+  },
 ];
+
+/**
+ * Colour-only themes: they change colours and gradients but leave shapes
+ * alone. Every dark colour keeps at least 4.5:1 against its background
+ * (enforced by a test), so none of them should cost scannability.
+ */
+export type ColorTheme = {
+  name: string;
+  colors: Pick<Style, 'fg' | 'fg2' | 'bg' | 'gradient' | 'gradientAngle' | 'eyeColor'>;
+};
+
+export const COLOR_THEMES: ColorTheme[] = [
+  { name: 'Ink', colors: { fg: '#000000', fg2: '#000000', bg: '#ffffff', gradient: 'none', gradientAngle: 45, eyeColor: null } },
+  { name: 'Sunset', colors: { fg: '#c2410c', fg2: '#7e22ce', bg: '#ffffff', gradient: 'linear', gradientAngle: 45, eyeColor: null } },
+  { name: 'Ocean', colors: { fg: '#0e7490', fg2: '#1e3a8a', bg: '#f0f9ff', gradient: 'linear', gradientAngle: 90, eyeColor: null } },
+  { name: 'Aurora', colors: { fg: '#047857', fg2: '#6d28d9', bg: '#ffffff', gradient: 'linear', gradientAngle: 135, eyeColor: null } },
+  { name: 'Berry', colors: { fg: '#9d174d', fg2: '#4c1d95', bg: '#fdf2f8', gradient: 'radial', gradientAngle: 45, eyeColor: null } },
+  { name: 'Ember', colors: { fg: '#991b1b', fg2: '#c2410c', bg: '#fffbeb', gradient: 'radial', gradientAngle: 45, eyeColor: '#7f1d1d' } },
+  { name: 'Midnight', colors: { fg: '#1e1b4b', fg2: '#3730a3', bg: '#eef2ff', gradient: 'linear', gradientAngle: 90, eyeColor: '#0f172a' } },
+  { name: 'Forest', colors: { fg: '#14532d', fg2: '#3f6212', bg: '#f7fee7', gradient: 'radial', gradientAngle: 45, eyeColor: null } },
+  { name: 'Mono blue', colors: { fg: '#1d4ed8', fg2: '#1d4ed8', bg: '#ffffff', gradient: 'none', gradientAngle: 45, eyeColor: '#1e3a8a' } },
+  { name: 'Slate', colors: { fg: '#334155', fg2: '#0f172a', bg: '#f8fafc', gradient: 'linear', gradientAngle: 90, eyeColor: null } },
+];
+
+export function matchesTheme(style: Style, t: ColorTheme): boolean {
+  const c = t.colors;
+  return (
+    style.fg === c.fg &&
+    style.bg === c.bg &&
+    style.gradient === c.gradient &&
+    style.eyeColor === c.eyeColor &&
+    (c.gradient === 'none' || (style.fg2 === c.fg2 && (c.gradient === 'radial' || style.gradientAngle === c.gradientAngle)))
+  );
+}
 
 export function pickLook(style: Style): Look {
   const {

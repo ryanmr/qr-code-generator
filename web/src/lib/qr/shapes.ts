@@ -26,6 +26,17 @@ export function circle(cx: number, cy: number, r: number): string {
   return `M${n(cx - r)} ${n(cy)}a${n(r)} ${n(r)} 0 1 1 ${n(2 * r)} 0a${n(r)} ${n(r)} 0 1 1 ${n(-2 * r)} 0z`;
 }
 
+/** A five-point star, wound clockwise from the top point. */
+function star(cx: number, cy: number, outer: number, inner: number): string {
+  let d = '';
+  for (let i = 0; i < 10; i++) {
+    const r = i % 2 === 0 ? outer : inner;
+    const a = -Math.PI / 2 + (i * Math.PI) / 5;
+    d += `${i === 0 ? 'M' : 'L'}${n(cx + r * Math.cos(a))} ${n(cy + r * Math.sin(a))}`;
+  }
+  return `${d}z`;
+}
+
 function diamond(cx: number, cy: number, r: number): string {
   return `M${n(cx)} ${n(cy - r)}L${n(cx + r)} ${n(cy)}L${n(cx)} ${n(cy + r)}L${n(cx - r)} ${n(cy)}z`;
 }
@@ -58,6 +69,10 @@ export function modulePath(shape: ModuleShape, x: number, y: number, { t, r, b, 
       return circle(x + 0.5, y + 0.5, 0.42);
     case 'diamond':
       return diamond(x + 0.5, y + 0.5, 0.52);
+    case 'star':
+      // A fat inner radius keeps enough ink at the centre, where decoders
+      // sample, and the tips just reach the neighbouring modules.
+      return star(x + 0.5, y + 0.55, 0.6, 0.3);
     case 'vertical': {
       const w = 0.76;
       const k = w / 2;

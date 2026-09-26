@@ -82,3 +82,26 @@ describe('alignmentCentres', () => {
     }
   });
 });
+
+describe('colour themes', () => {
+  it('keep 4.5:1 contrast for every dark colour', async () => {
+    const { COLOR_THEMES } = await import('@/lib/style');
+    const { contrast } = await import('@/lib/color');
+    for (const t of COLOR_THEMES) {
+      const c = t.colors;
+      const darks = [c.fg, ...(c.gradient === 'none' ? [] : [c.fg2]), ...(c.eyeColor ? [c.eyeColor] : [])];
+      for (const d of darks) expect(contrast(d, c.bg), `${t.name} ${d}`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it('decode with every module shape', async () => {
+    const { COLOR_THEMES } = await import('@/lib/style');
+    for (const t of COLOR_THEMES) {
+      for (const moduleShape of MODULE_SHAPES) {
+        expect(roundTrip(URL_TEXT, { ...DEFAULT_STYLE, ...t.colors, moduleShape }), `${t.name} ${moduleShape}`).toBe(
+          URL_TEXT,
+        );
+      }
+    }
+  });
+});
