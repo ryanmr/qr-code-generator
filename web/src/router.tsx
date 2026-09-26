@@ -17,7 +17,6 @@ function RootLayout() {
             <QrCode className="size-5 shrink-0" />
             QR
           </Link>
-          <span className="hidden text-xs text-muted-foreground sm:inline">· made in your browser, sent nowhere</span>
 
           <nav className="flex min-w-0 flex-1 items-center justify-end gap-0.5">
             {NAV.map(({ to, label, icon: Icon }) => (
