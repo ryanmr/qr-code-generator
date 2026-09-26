@@ -9,7 +9,8 @@ import { encode, type Encoded } from '@/lib/qr/encode';
 import { svgToPng } from '@/lib/qr/rasterize';
 import { renderSvg, type Logo } from '@/lib/qr/render-svg';
 import { scanCheck } from '@/lib/qr/scan-check';
-import { readShareHash, sanitizeContent, shareUrl } from '@/lib/share';
+import { fromQuery, toQuery } from '@/lib/query';
+import { readShareHash, sanitizeContent } from '@/lib/share';
 import { KEYS, load, save } from '@/lib/storage';
 import { DEFAULT_STYLE, pickLook, sanitizeStyle, type Preset, type Style } from '@/lib/style';
 
@@ -62,18 +63,29 @@ interface Initial {
 
 function initialState(): Initial {
   const fields: Fields = structuredClone(EMPTY_FIELDS);
+  const seed = (content: Content) => {
+    (fields as Record<ContentType, unknown>)[content.type] = content.fields;
+  };
+  const saved = sanitizeStyle(load(KEYS.style));
+
+  const fromUrl = fromQuery(location.search, saved);
+  if (fromUrl.content || fromUrl.style) {
+    if (fromUrl.content) seed(fromUrl.content);
+    return { type: fromUrl.content?.type ?? 'url', fields, style: fromUrl.style ?? saved };
+  }
+
   const shared = readShareHash();
   if (shared) {
-    (fields as Record<ContentType, unknown>)[shared.content.type] = shared.content.fields;
+    seed(shared.content);
     return { type: shared.content.type, fields, style: shared.style };
   }
-  const style = sanitizeStyle(load(KEYS.style));
+
   const remembered = load<boolean>(KEYS.rememberContent) ? sanitizeContent(load(KEYS.content)) : null;
   if (remembered) {
-    (fields as Record<ContentType, unknown>)[remembered.type] = remembered.fields;
-    return { type: remembered.type, fields, style };
+    seed(remembered);
+    return { type: remembered.type, fields, style: saved };
   }
-  return { type: 'url', fields, style };
+  return { type: 'url', fields, style: saved };
 }
 
 export function Generator() {
@@ -121,11 +133,13 @@ export function Generator() {
     save(KEYS.content, rememberContent ? content : null);
   }, [rememberContent, content]);
 
-  // A share link has done its job once loaded; drop it so edits are not
-  // confused with the shared original on refresh.
+  // Keep the address bar describing the current code, so it can be copied or
+  // bookmarked as-is. replaceState, not push: typing should not flood history.
+  // Passing the existing state along keeps TanStack Router's history key.
+  const query = useMemo(() => toQuery(content, style), [content, style]);
   useEffect(() => {
-    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
-  }, []);
+    history.replaceState(history.state, '', `${location.pathname}?${query}`);
+  }, [query]);
 
   useEffect(() => {
     if (!qr) {
@@ -199,7 +213,7 @@ export function Generator() {
                   navigator.clipboard.write([new ClipboardItem({ 'image/png': svgToPng(exportSvg(), style.size) })])
               : undefined
           }
-          onCopyLink={() => copyText(shareUrl(content, style))}
+          onCopyLink={() => copyText(`${location.origin}${location.pathname}?${query}`)}
         />
       </section>
 

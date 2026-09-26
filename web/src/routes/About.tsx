@@ -19,8 +19,8 @@ const POINTS = [
   },
   {
     icon: Hash,
-    title: 'Share links stay out of logs',
-    body: 'A share link carries everything after the #, which browsers never send to a server. They are only made when you click the button, and the address bar is not kept in sync, so nothing ends up in history unless you ask. Logos are never included.',
+    title: 'Every code has a URL',
+    body: 'The address bar keeps the content and style as readable query parameters, so any URL you copy recreates the code, and ?url=… seeds the input. That means content sits in your browser history. The server logs paths only, never the query string, and Traefik keeps no access log. Logos are never included.',
   },
   {
     icon: HardDrive,

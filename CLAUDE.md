@@ -7,8 +7,10 @@ Offline QR code generator. Read `README.md` first; it covers the architecture.
 - **No network from the page.** The CSP in `server/src/headers.ts` has
   `connect-src 'none'`. Do not loosen it, add CDN assets, web fonts or
   analytics, or add a server endpoint that accepts QR content.
-- **Never put content in the query string.** It ends up in Traefik/Hono logs.
-  Share state goes in the hash (`web/src/lib/share.ts`).
+- **Query strings carry content, so never log them.** The address bar mirrors
+  the whole state (`web/src/lib/query.ts`). The server's request logger prints
+  the path only. Do not swap in `hono/logger`, which logs full URLs. Do not
+  enable a Traefik access log for this router without dropping the query.
 - **One renderer.** Preview, SVG and PNG all come from `renderSvg`. Do not add
   a second drawing path (e.g. canvas-native) or they will drift.
 - **New shapes/presets must pass the round-trip tests** (`npm test`). They

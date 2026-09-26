@@ -13,8 +13,12 @@ sensible file names. Served at `https://qr.internal.home.ifupdown.com` and
   `connect-src 'none'`, so the page cannot make any network request at all.
   If you add a feature that needs one, you are changing the premise of the app.
 - **No third-party assets.** No CDNs, web fonts or analytics; Vite bundles everything.
-- **Share links use the URL hash** (`#q=…`), which is never sent to a server,
-  and are only made when you click "Share link". Logos are never included.
+- **Every code has a URL.** The address bar is kept in sync with readable
+  query parameters (`web/src/lib/query.ts`), so it can be copied or bookmarked.
+  The server logs paths only (a custom logger in `server/src/index.ts`;
+  Hono's built-in one would log the query), and Traefik has no access log.
+  Content, Wi-Fi passwords included, does end up in browser history.
+  Logos are never included.
 - **Storage:** style and saved presets in `localStorage`; content only if
   "Remember content" is on; logos in memory only.
 
@@ -35,6 +39,24 @@ meeting at it are exposed, so runs fuse into blobs and bars. Finder **and
 alignment** patterns are drawn as whole shapes in the eye style; leaving the
 alignment pattern to the module shape made dot and diamond codes undecodable
 from version 2 up.
+
+## URL parameters
+
+| Key | Meaning |
+|---|---|
+| `type` | `url` (default), `text`, `wifi`, `email`, `phone`, `sms`, `contact`, `location`. Inferred from the fields present if omitted |
+| content fields | Same names as the form: `url`, `text`, `ssid`/`password`/`security`/`hidden`, `to`/`subject`/`body`, `number`/`message`, `name`/`phone`/`email`/`org`/`url`, `lat`/`lng` |
+| `shape` | `square`, `rounded`, `extra-rounded`, `dots`, `classy`, `vertical`, `horizontal`, `diamond`, `star` |
+| `frame`, `ball` | Eye frame / centre: `square`, `rounded`, `circle`, `leaf` |
+| `fg`, `fg2`, `bg`, `eye` | Hex colours without `#`; `eye=none` follows the foreground |
+| `gradient`, `angle` | `none`/`linear`/`radial`, degrees |
+| `transparent`, `boost` | `1`/`0` |
+| `margin`, `radius`, `size` | Modules 0–8, percent 0–100, pixels 64–8192 |
+| `ecc`, `version`, `mask` | `L`/`M`/`Q`/`H`, 1–40, -1–7 |
+
+`?url=example.com` just seeds the input and keeps your saved style; extra style
+keys adjust it. A URL with `shape` (which the synced address bar always has)
+describes the whole style, so missing keys mean the default. Old `#q=` share links still load.
 
 ## Development
 

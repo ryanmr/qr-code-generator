@@ -2,30 +2,14 @@ import { CONTENT_TYPES, EMPTY_FIELDS, type Content, type ContentType } from '@/l
 import { sanitizeStyle, type Style } from '@/lib/style';
 
 /**
- * Share links carry everything in the URL hash. Browsers never send the hash
- * to the server, so a shared code's content does not show up in Traefik or
- * app logs. It does land in the recipient's history, which is why links are
- * only made on request and the address bar is not kept in sync.
+ * Reads the older `#q=<base64 JSON>` share links. New links use readable query
+ * parameters (query.ts); this stays so links already handed out keep working.
  */
 const KEY = 'q';
-
-function toBase64Url(s: string): string {
-  const bytes = new TextEncoder().encode(s);
-  let bin = '';
-  for (const b of bytes) bin += String.fromCharCode(b);
-  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
 
 function fromBase64Url(s: string): string {
   const bin = atob(s.replace(/-/g, '+').replace(/_/g, '/'));
   return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)));
-}
-
-export function shareUrl(content: Content, style: Style, base = location.href): string {
-  const url = new URL(base);
-  url.search = '';
-  url.hash = `${KEY}=${toBase64Url(JSON.stringify({ c: content, s: style }))}`;
-  return url.toString();
 }
 
 export function sanitizeContent(raw: unknown): Content | null {

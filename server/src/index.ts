@@ -1,6 +1,5 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
-import { logger } from 'hono/logger';
 import process from 'node:process';
 import { config } from './config.js';
 import { securityHeaders } from './headers.js';
@@ -8,9 +7,14 @@ import { serveSpa } from './static.js';
 
 const app = new Hono();
 
-// Safe to log every request: QR content never reaches the server. Share links
-// carry it in the URL hash, which browsers do not send.
-app.use('*', logger());
+// The page keeps QR content in the query string so URLs are shareable, so log
+// the path only. Hono's built-in logger would write the full URL, content and
+// Wi-Fi passwords included, into `docker logs`.
+app.use('*', async (c, next) => {
+  const start = Date.now();
+  await next();
+  console.log(`${c.req.method} ${new URL(c.req.url).pathname} ${c.res.status} ${Date.now() - start}ms`);
+});
 app.use('*', securityHeaders());
 app.get('/api/health', (c) => c.json({ ok: true }));
 app.use('*', serveSpa(config.webDist));
