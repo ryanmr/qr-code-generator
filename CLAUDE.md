@@ -6,7 +6,15 @@ Offline QR code generator. Read `README.md` first; it covers the architecture.
 
 - **No network from the page.** The CSP in `server/src/headers.ts` has
   `connect-src 'none'`. Do not loosen it, add CDN assets, web fonts or
-  analytics, or add a server endpoint that accepts QR content.
+  analytics, or add a server endpoint that accepts QR content. The build also
+  writes it into `index.html` as a `<meta>` tag (`web/vite.config.ts`) for
+  static hosts, so it applies to both targets.
+- **Two build targets.** `npm run build` for the container (Hono serves the
+  SPA); `npm run build:static --workspace=web` for GitHub Pages
+  (`.github/workflows/pages.yml`), with `BASE_PATH` for the subpath. Links and
+  asset paths must respect `import.meta.env.BASE_URL`.
+- **Public repo.** No secrets, hostnames beyond `docker-compose.yml`, or
+  personal data in commits.
 - **Query strings carry content, so never log them.** The address bar mirrors
   the whole state (`web/src/lib/query.ts`). The server's request logger prints
   the path only. Do not swap in `hono/logger`, which logs full URLs. Do not
@@ -22,5 +30,6 @@ Offline QR code generator. Read `README.md` first; it covers the architecture.
 
 ```sh
 npm test && npm run typecheck && npm run build
+VITE_TARGET=static BASE_PATH=/qr-code-generator/ npm run build --workspace=web
 docker compose config -q
 ```
