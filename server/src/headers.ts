@@ -11,8 +11,13 @@ import type { MiddlewareHandler } from 'hono';
  *
  * Inline styles are allowed because the SVG preview and Base UI set style
  * attributes; inline scripts are not.
+ *
+ * The web build also writes this policy into index.html as a <meta> tag
+ * (web/vite.config.ts), so static hosts such as GitHub Pages, which cannot set
+ * headers, enforce it too. A <meta> policy ignores frame-ancestors, which is
+ * why the header still matters where there is one.
  */
-const CSP = [
+export const CSP_DIRECTIVES = [
   "default-src 'self'",
   "script-src 'self'",
   "style-src 'self' 'unsafe-inline'",
@@ -23,7 +28,9 @@ const CSP = [
   "base-uri 'none'",
   "form-action 'none'",
   "frame-ancestors 'none'",
-].join('; ');
+];
+
+const CSP = CSP_DIRECTIVES.join('; ');
 
 export function securityHeaders(): MiddlewareHandler {
   return async (c, next) => {

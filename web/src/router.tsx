@@ -1,11 +1,11 @@
 import { Link, Outlet, createRootRoute, createRoute, createRouter } from '@tanstack/react-router';
-import { QrCode, ShieldCheck, WandSparkles } from 'lucide-react';
+import { Info, QrCode, WandSparkles } from 'lucide-react';
 import { About } from '@/routes/About';
 import { Generator } from '@/routes/Generator';
 
 const NAV = [
   { to: '/', label: 'Generate', icon: WandSparkles },
-  { to: '/about', label: 'Privacy', icon: ShieldCheck },
+  { to: '/about', label: 'About', icon: Info },
 ] as const;
 
 function RootLayout() {
@@ -57,7 +57,12 @@ const aboutRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([indexRoute, aboutRoute]);
 
-export const router = createRouter({ routeTree, scrollRestoration: true });
+export const router = createRouter({
+  routeTree,
+  // '/' normally; '/<repo>/' on GitHub Pages (BASE_PATH in vite.config.ts).
+  basepath: import.meta.env.BASE_URL,
+  scrollRestoration: true,
+});
 
 declare module '@tanstack/react-router' {
   interface Register {

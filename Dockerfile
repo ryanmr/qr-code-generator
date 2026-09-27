@@ -10,6 +10,8 @@ RUN npm ci
 
 COPY server ./server
 COPY web ./web
+# Optional public URL, for absolute og:image links in social previews.
+ARG SITE_URL
 RUN npm run build
 
 # Drop dev dependencies from what gets copied forward.

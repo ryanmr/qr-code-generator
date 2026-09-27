@@ -5,9 +5,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:static": "VITE_TARGET=static npm run build",
     "preview": "vite preview",
     "test": "vitest run",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc -b --noEmit",
+    "icons": "vite-node scripts/make-icons.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
