@@ -37,8 +37,8 @@ const PRIVACY: { icon: LucideIcon; title: string; body: ReactNode }[] = [
   },
   {
     icon: Hash,
-    title: 'Every code has a URL',
-    body: `The address bar keeps content and style as query parameters, so a copied link recreates the code. That also puts content in your browser history, and opening such a link sends the whole URL to whoever hosts the page. ${
+    title: 'Links only when you ask',
+    body: `“Share link” copies a URL with the content and style as query parameters, and puts it in the address bar. Until you press it, the address bar holds nothing but the page. A shared link lands in browser history, and opening one sends the whole URL to whoever hosts the page. ${
       STATIC_BUILD
         ? 'This copy is hosted on GitHub Pages, so GitHub’s logging applies.'
         : 'This server logs paths only, never the query string.'

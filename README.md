@@ -33,10 +33,11 @@ main reason to trust the output.
   `index.html` as a `<meta>` tag, so static hosts enforce it too.
 - **No third-party assets.** No CDNs, web fonts, analytics or tracking codes;
   Vite bundles everything.
-- **Every code has a URL.** The address bar is kept in sync with readable
-  query parameters (`web/src/lib/query.ts`), so it can be copied or
-  bookmarked. That means content, Wi-Fi passwords included, ends up in browser
-  history, and opening such a link sends it to whoever hosts the page. The
+- **Links only when you ask.** "Share link" copies a URL with readable query
+  parameters (`web/src/lib/query.ts`) and puts it in the address bar; until
+  then the address bar is just the page, and editing after sharing clears it
+  again. A shared link puts content, Wi-Fi passwords included, in browser
+  history, and opening one sends it to whoever hosts the page. The
   bundled server logs paths only (Hono's built-in logger would log the query).
   Logos are never included.
 - **Storage:** style and saved presets in `localStorage`; content only if
@@ -112,7 +113,7 @@ from version 2 up.
 | `ecc`, `version`, `mask` | `L`/`M`/`Q`/`H`, 1–40, -1–7 |
 
 `?url=example.com` just seeds the input and keeps your saved style; extra style
-keys adjust it. A URL with `shape` (which the synced address bar always has)
+keys adjust it. A URL with `shape` (which "Share link" always writes)
 describes the whole style, so missing keys mean the default. Old `#q=` share links still load.
 
 ## Development

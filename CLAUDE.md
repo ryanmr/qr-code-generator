@@ -15,8 +15,9 @@ Offline QR code generator. Read `README.md` first; it covers the architecture.
   asset paths must respect `import.meta.env.BASE_URL`.
 - **Public repo.** No secrets, hostnames beyond `docker-compose.yml`, or
   personal data in commits.
-- **Query strings carry content, so never log them.** The address bar mirrors
-  the whole state (`web/src/lib/query.ts`). The server's request logger prints
+- **Query strings carry content, so never log them.** "Share link" writes the
+  whole state into the URL (`web/src/lib/query.ts`); the address bar carries
+  it only after that, or when a shared link was opened, until the next edit. The server's request logger prints
   the path only. Do not swap in `hono/logger`, which logs full URLs. Do not
   enable a Traefik access log for this router without dropping the query.
 - **One renderer.** Preview, SVG and PNG all come from `renderSvg`. Do not add

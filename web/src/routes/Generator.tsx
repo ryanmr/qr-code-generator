@@ -133,12 +133,21 @@ export function Generator() {
     save(KEYS.content, rememberContent ? content : null);
   }, [rememberContent, content]);
 
-  // Keep the address bar describing the current code, so it can be copied or
-  // bookmarked as-is. replaceState, not push: typing should not flood history.
-  // Passing the existing state along keeps TanStack Router's history key.
+  // The address bar carries state only when asked. A link you opened keeps its
+  // URL until you change something; "Share link" writes the current state into
+  // it; otherwise it stays a plain path rather than churning as you type.
+  // replaceState passes the existing state along to keep TanStack Router's key.
   const query = useMemo(() => toQuery(content, style), [content, style]);
+  const [linked, setLinked] = useState(query);
   useEffect(() => {
+    if (query !== linked && (location.search || location.hash)) {
+      history.replaceState(history.state, '', location.pathname);
+    }
+  }, [query, linked]);
+  const shareLink = useCallback(() => {
     history.replaceState(history.state, '', `${location.pathname}?${query}`);
+    setLinked(query);
+    return copyText(`${location.origin}${location.pathname}?${query}`);
   }, [query]);
 
   useEffect(() => {
@@ -213,7 +222,7 @@ export function Generator() {
                   navigator.clipboard.write([new ClipboardItem({ 'image/png': svgToPng(exportSvg(), style.size) })])
               : undefined
           }
-          onCopyLink={() => copyText(`${location.origin}${location.pathname}?${query}`)}
+          onCopyLink={shareLink}
         />
       </section>
 

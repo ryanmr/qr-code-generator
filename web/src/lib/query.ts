@@ -8,8 +8,8 @@ import { DEFAULT_STYLE, sanitizeStyle, type Style } from '@/lib/style';
  *   /?type=wifi&ssid=Home&password=hunter2
  *   /?url=example.com&shape=dots&frame=circle&fg=1e3a8a&size=2048
  *
- * The address bar is kept in sync, so any URL copied from it reproduces the
- * code. Content fields use the same names as the form (`Fields` in
+ * "Share link" writes this into the clipboard and the address bar, and the URL
+ * reproduces the code. Content fields use the same names as the form (`Fields` in
  * payload.ts). The server logs paths only, never the query string.
  */
 
@@ -87,8 +87,8 @@ function inferType(q: URLSearchParams): ContentType | null {
  * Reads whatever the query provides. Content is null when no content fields
  * are present, and style is null when no style keys are.
  *
- * With `shape` present the URL is a full description (that is what the synced
- * address bar produces), so missing keys mean default. Without it, style keys
+ * With `shape` present the URL is a full description (that is what "Share link"
+ * produces), so missing keys mean default. Without it, style keys
  * adjust `saved`, so a hand-written ?url=…&size=2048 keeps this browser's look.
  */
 export function fromQuery(

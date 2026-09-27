@@ -137,7 +137,7 @@ export function DownloadBar({
           disabled={disabled || busy}
           onClick={() => run('link', onCopyLink)}
           className={cn(!onCopyPng && 'col-span-2')}
-          title="Copies a link that recreates this code, content and style included"
+          title="Copies a link that recreates this code, content and style included, and puts it in the address bar"
         >
           {flash === 'link' ? <Check /> : <Link2 />} {flash === 'link' ? 'Link copied' : 'Share link'}
         </Button>
